@@ -17,9 +17,7 @@ class Knife(arcade.Sprite):
         
         self.KNIFE_PROPELLED_SOUND = GAME_CONFIG["assets_path"]["sounds"]["knife_propelled"]
         self.KNIFE_PROPELLED_SOUND = arcade.load_sound(self.KNIFE_PROPELLED_SOUND)
-        self.TARGET_HITTED_SOUND = GAME_CONFIG["assets_path"]["sounds"]["target_hitted"]
-        self.TARGET_HITTED_SOUND = arcade.load_sound(self.TARGET_HITTED_SOUND)
-
+        
         super().__init__(self.KNIFE_IMAGE, self.SPRITE_SCALING/2)
 
         self.center_x = self.KNIFE_POSITION[0]
@@ -46,7 +44,7 @@ class Knife(arcade.Sprite):
         """
         self.stucked_in_target = target
 
-        arcade.play_sound(self.TARGET_HITTED_SOUND)
+        arcade.play_sound(self.stucked_in_target.TARGET_HITTED_SOUND)
         self.target_hitted = True
         self.change_y = 0
         # self.rotation_speed = rotation_speed
