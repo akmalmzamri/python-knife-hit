@@ -21,6 +21,13 @@ class Obstacle(arcade.Sprite):
         self.rotation_center = self.target.TARGET_POSITION
         self.initial_rotation_position = initial_rotation_position
 
+        # Reshape the collision
+        self.points = (
+            (-self.width // 3, self.height // 2),
+            (self.width // 3, -self.height // 2),
+            (-self.width // 3, -self.height // 2),
+            )
+
     def update(self):
         """ Movement and game logic """
         
