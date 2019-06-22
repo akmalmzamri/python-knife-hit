@@ -58,7 +58,7 @@ class Knife(arcade.Sprite):
 
     def update(self):
         """ Movement and game logic """
-        
+
         # Play the knife propelled animation
         if self.knife_hitted:
             self.center_y += -30
@@ -69,6 +69,7 @@ class Knife(arcade.Sprite):
             self.center_y += self.change_y
         
         # Stuck the knife into the target and have it spin together
+        # We added 270 to the rotation because the knife must start from the bottom
         if self.target_hitted:
             self.rotation += self.rotation_speed
             self.angle = self.rotation

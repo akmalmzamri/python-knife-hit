@@ -20,9 +20,9 @@ class KnifeCount(arcade.Sprite):
         if(image_name=="background"):
             self.image_name = self.KNIFE_COUNT_BG
         
-        super().__init__(self.image_name, self.SPRITE_SCALING/1)
+        super().__init__(self.image_name, self.SPRITE_SCALING/1.2)
         
         # Automatically position the knife count image based on the number of knife count
         self.knife_count = knife_count
         self.center_x = self.SCREEN_WIDTH * 0.1
-        self.center_y = (self.SCREEN_HEIGHT * 0.1 ) + (self.knife_count*self.SCREEN_HEIGHT*0.05)
+        self.center_y = (self.SCREEN_HEIGHT * 0.1 ) + (self.knife_count*self.SCREEN_HEIGHT*0.03)

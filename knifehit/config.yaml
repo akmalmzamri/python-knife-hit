@@ -20,6 +20,8 @@ general_settings:
   screen_height: 960
   screen_title: "Python Knife Hit"
   game_over_delay: 1
+  max_knife_count: 10
+  min_knife_count: 5
 knife_settings:
   speed: 70
 target_settings:

@@ -9,6 +9,7 @@ from enum import Enum
 from knife import Knife
 from knifecount import KnifeCount
 from target import Target
+from obstacle import Obstacle
 
 class GameState(Enum):
     """ Store game state in enum """
@@ -36,6 +37,10 @@ class GameManager(arcade.Window):
         self.GAME_OVER_DELAY = GAME_CONFIG["general_settings"]["game_over_delay"]
         self.BACKGROUND_INGAME = GAME_CONFIG["assets_path"]["images"]["background_ingame"]
         self.BACKGROUND_GAMEOVER = GAME_CONFIG["assets_path"]["images"]["background_gameover"]
+
+        self.MAX_KNIFE_COUNT = GAME_CONFIG["general_settings"]["max_knife_count"]
+        self.MIN_KNIFE_COUNT = GAME_CONFIG["general_settings"]["min_knife_count"]
+        # self.MAX_OBSTACLE_COUNT = GAME_CONFIG["general_settings"]["max_obstacle_count"]
         
         # Call the parent class initializer
         super().__init__(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.SCREEN_TITLE)
@@ -57,17 +62,20 @@ class GameManager(arcade.Window):
         self.target = None
         self.target_collider = None
         self.knife_count_display = None
+        self.obstacle = None
 
         # Variables that will hold sprite lists
         self.knife_list = None
         self.target_list = None
         self.target_collider_list = None
         self.knife_count_display_list = None
+        self.obstacle_list = None
 
         # Set up the game score
         self.score = 0
         self.stage = 1
         self.score_text = None
+        self.initial_knife_count = None
         self.knife_count = None
 
         # Don't show the mouse cursor
@@ -88,9 +96,11 @@ class GameManager(arcade.Window):
         self.target_list = arcade.SpriteList()
         self.target_collider_list = arcade.SpriteList()
         self.knife_count_display_list = arcade.SpriteList()
+        self.obstacle_list  = arcade.SpriteList()
 
         # Set up the game score and knife count
-        self.knife_count = random.randrange(6,10)
+        self.knife_count = random.randrange(self.MIN_KNIFE_COUNT, self.MAX_KNIFE_COUNT)
+        self.initial_knife_count = self.knife_count
 
         # Set up the knife
         self.create_knife()
@@ -103,6 +113,9 @@ class GameManager(arcade.Window):
 
         # Set up the target collider
         self.create_target_collider()
+
+        # Set up the obstacle
+        self.create_obstacle()
     
     def draw_game_over(self):
         """ Draw game over menu across the screen. """
@@ -141,8 +154,16 @@ class GameManager(arcade.Window):
 
         # Draw all the sprites.
         self.knife_list.draw()
+        self.obstacle_list.draw()
         self.target_list.draw()
         self.knife_count_display_list.draw()
+        
+        # Display score
+        output = f"Press <space> to shoot"
+        arcade.draw_text(
+            output, self.SCREEN_WIDTH*0.5, self.SCREEN_HEIGHT*0.05, (255,255,255), 12,  
+            align="center", anchor_x="center", anchor_y="center",
+            )
 
         # Display score
         output = f"{self.score}"
@@ -184,6 +205,19 @@ class GameManager(arcade.Window):
         self.target_list.update()
         self.knife_list.update()
         self.target_collider_list.update()
+        self.obstacle_list.update()
+
+        # Check if knife collided with the knifes stucked in the target.
+        obstacle_hit_list = arcade.check_for_collision_with_list(self.knife, self.obstacle_list)
+        if not self.knife.target_hitted:
+            for collided_object in obstacle_hit_list:
+                # Show "knife propelled" animation
+                self.knife.propel_knife(self.target.TARGET_ROTATION_SPEED)
+
+                # Put the game over trigger in a thread so we can show the "knife propelled" animation
+                game_over_trigger_thread = threading.Thread(target=self.trigger_game_over, args=(self.GAME_OVER_DELAY,))
+                game_over_trigger_thread.start()
+        
 
         # Check if knife collided with the knifes stucked in the target.
         knife_hit_list = arcade.check_for_collision_with_list(self.knife, self.knife_list)
@@ -223,8 +257,20 @@ class GameManager(arcade.Window):
         # Shoot knife
         if key == arcade.key.SPACE and self.knife_count > 0:
             self.knife_count -= 1
+
+            # Play knife shooting animation
             self.knife.shoot_knife()
-            self.knife_count_display_list.pop()
+            
+            # Remove the foreground image of knife count
+            # to indicates how many knife we had used
+
+            # This is the ideal way to do this but will cause error
+            # self.knife_count_display_list.pop()
+
+            # Instead of removing the sprite from sprite list,
+            # we simply set the opacity to 0
+            knife_used = self.initial_knife_count - self.knife_count
+            self.knife_count_display_list[-knife_used].alpha = (0)
 
         # Restart game
         if key == arcade.key.ENTER and self.current_state == GameState.GAME_OVER:
@@ -239,14 +285,17 @@ class GameManager(arcade.Window):
         self.target = None
         self.target_collider = None
         self.knife_count_display = None
+        self.obstacle = None
 
         # Variables that will hold sprite lists
         self.knife_list = None
         self.target_list = None
         self.target_collider_list = None
         self.knife_count_display_list = None
+        self.obstacle_list = None
 
         self.stage += 1
+        
         self.setup()
         self.current_state = GameState.GAME_RUNNING
 
@@ -277,6 +326,37 @@ class GameManager(arcade.Window):
             self.knife_count_display = KnifeCount(self.GAME_CONFIG, "foregroud", i)
             self.knife_count_display_list.append(self.knife_count_display)
     
+    def create_obstacle(self):
+        """ Create obstacle if stage is more than 1 """
+        
+        rotation_speed = self.target.TARGET_ROTATION_SPEED
+        rotation_radius = (self.target_collider.height/2)+30
+        rotation_center =  self.target.TARGET_POSITION
+
+        if self.stage > 1:
+            # Max obstacle count are inversely proportional to stage knife count
+            max_obstacle_count = (self.MAX_KNIFE_COUNT - self.initial_knife_count)+2
+            obstacle_count = random.randrange(0, max_obstacle_count)
+            
+            current_rotation = []
+            for i in range(obstacle_count):
+                while True:
+                    # Randomize the obstacle position
+                    initial_rotation_position = random.randrange(0,359)
+                    if not current_rotation:
+                        break
+
+                    # Make sure the obstacle are not too close with each other        
+                    closest_rotation = min(current_rotation, key=lambda x:abs(x-initial_rotation_position))
+                    if abs(closest_rotation-initial_rotation_position) > 10:
+                        break
+
+                # Create the obstacle
+                current_rotation.append(initial_rotation_position)
+                self.obstacle = Obstacle(self.GAME_CONFIG, rotation_speed, rotation_radius, rotation_center, initial_rotation_position)
+                self.obstacle_list.append(self.obstacle)
+    
+
     def trigger_game_over(self, delay):
         """ Trigger game over after certain delay """
         time.sleep(delay)
