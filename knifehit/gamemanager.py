@@ -410,4 +410,9 @@ class GameManager(arcade.Window):
         """ Trigger game over after certain delay """
         time.sleep(delay)
         self.current_state = GameState.GAME_OVER
+    
+    def trigger_next_stage(self, delay):
+        """ Trigger game over after certain delay """
+        time.sleep(delay)
+        self.current_state = GameState.GAME_OVER
 
