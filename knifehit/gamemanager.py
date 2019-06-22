@@ -204,7 +204,7 @@ class GameManager(arcade.Window):
         # Run update function of every object
         self.target_list.update()
         self.knife_list.update()
-        self.target_collider_list.update()
+        # self.target_collider_list.update()
         self.obstacle_list.update()
 
         # Check if knife collided with the knifes stucked in the target.
@@ -212,7 +212,7 @@ class GameManager(arcade.Window):
         if not self.knife.target_hitted:
             for collided_object in obstacle_hit_list:
                 # Show "knife propelled" animation
-                self.knife.propel_knife(self.target.TARGET_ROTATION_SPEED)
+                self.knife.propel_knife(self.target)
 
                 # Put the game over trigger in a thread so we can show the "knife propelled" animation
                 game_over_trigger_thread = threading.Thread(target=self.trigger_game_over, args=(self.GAME_OVER_DELAY,))
@@ -224,7 +224,7 @@ class GameManager(arcade.Window):
         if not self.knife.target_hitted:
             for collided_object in knife_hit_list:
                 # Show "knife propelled" animation
-                self.knife.propel_knife(self.target.TARGET_ROTATION_SPEED)
+                self.knife.propel_knife(self.target)
 
                 # Put the game over trigger in a thread so we can show the "knife propelled" animation
                 game_over_trigger_thread = threading.Thread(target=self.trigger_game_over, args=(self.GAME_OVER_DELAY,))
@@ -242,7 +242,7 @@ class GameManager(arcade.Window):
 
                 # Calculate the knife angular rotation radius based on collider height
                 rotation_radius = (self.target_collider.height/2)+30
-                self.knife.hit_target(collided_object.TARGET_ROTATION_SPEED, rotation_radius, collided_object.TARGET_POSITION)
+                self.knife.hit_target(self.target)
                 
                 # Spawn new knife
                 if self.knife_count > 0:
@@ -304,9 +304,14 @@ class GameManager(arcade.Window):
         self.target = Target(self.GAME_CONFIG, scale_ratio=1.2)
         self.target_list.append(self.target)
     
+    def create_boss(self):
+        """ Create new target """
+        self.target = Boss(self.GAME_CONFIG, scale_ratio=1.2)
+        self.target_list.append(self.target)
+    
     def create_target_collider(self):
         """ Create new target collider """
-        self.target_collider = Target(self.GAME_CONFIG, scale_ratio=1.5)
+        self.target_collider = Target(self.GAME_CONFIG, scale_ratio=1.5, rotation_mode="STATIC")
         self.target_collider_list.append(self.target_collider)
     
     def create_knife(self):
@@ -353,7 +358,7 @@ class GameManager(arcade.Window):
 
                 # Create the obstacle
                 current_rotation.append(initial_rotation_position)
-                self.obstacle = Obstacle(self.GAME_CONFIG, rotation_speed, rotation_radius, rotation_center, initial_rotation_position)
+                self.obstacle = Obstacle(self.GAME_CONFIG, self.target, initial_rotation_position)
                 self.obstacle_list.append(self.obstacle)
     
     def trigger_game_over(self, delay):
