@@ -6,6 +6,7 @@ import threading
 import time
 from enum import Enum
 
+from boss import Boss
 from knife import Knife
 from knifecount import KnifeCount
 from target import Target
@@ -52,7 +53,7 @@ class GameManager(arcade.Window):
         os.chdir(file_path)
 
         # Initialize the game state
-        self.current_state = GameState.GAME_RUNNING
+        self.current_state = GameState.MENU
 
         # Background image will be stored in this variable
         self.background = None
@@ -109,7 +110,10 @@ class GameManager(arcade.Window):
         self.create_knife_count_display()
 
         # Set up the target
-        self.create_target()
+        if self.stage % 5 == 0:
+            self.create_boss()
+        else:
+            self.create_target()
 
         # Set up the target collider
         self.create_target_collider()
@@ -117,6 +121,33 @@ class GameManager(arcade.Window):
         # Set up the obstacle
         self.create_obstacle()
     
+    def draw_menu(self):
+        """ Draw main menu across the screen. """
+
+        # Draw the background texture
+        arcade.draw_texture_rectangle(
+            self.SCREEN_WIDTH // 2, 
+            self.SCREEN_HEIGHT // 2,
+            self.SCREEN_WIDTH, 
+            self.SCREEN_HEIGHT, 
+            self.background_gameover)
+
+        # Draw logo
+        self.logo_list = arcade.SpriteList()
+        self.logo = arcade.Sprite(self.GAME_CONFIG["assets_path"]["images"]["logo"], 0.5)
+        self.logo.center_x = self.SCREEN_WIDTH*0.5
+        self.logo.center_y = self.SCREEN_HEIGHT*0.6
+        self.logo_list.append(self.logo)
+        self.logo_list.draw()
+
+        # Display "Game Over" text
+        # output = "Python Knife Hit"
+        # arcade.draw_text(output, self.SCREEN_WIDTH*0.5, self.SCREEN_HEIGHT*0.6, arcade.color.WHITE, 54,  align="center", anchor_x="center")
+
+        # Display restart instruction
+        output = "Press <ENTER> To Start"
+        arcade.draw_text(output, self.SCREEN_WIDTH*0.5, self.SCREEN_HEIGHT*0.35, arcade.color.WHITE, 24,  align="center", anchor_x="center")
+
     def draw_game_over(self):
         """ Draw game over menu across the screen. """
 
@@ -173,11 +204,19 @@ class GameManager(arcade.Window):
             )
 
         # Display stage number
-        output = f"STAGE {self.stage}"
-        arcade.draw_text(
-            output, self.SCREEN_WIDTH*0.5, self.SCREEN_HEIGHT*0.95, arcade.color.WHITE, 28,
-            align="center", anchor_x="center", anchor_y="center"
-            )
+        if self.stage % 5 == 0:
+            output = f"BOSS FIGHT!!"
+            arcade.draw_text(
+                output, self.SCREEN_WIDTH*0.5, self.SCREEN_HEIGHT*0.95, (223, 87, 84), 32,
+                align="center", anchor_x="center", anchor_y="center"
+                )
+        
+        else:
+            output = f"STAGE {self.stage}"
+            arcade.draw_text(
+                output, self.SCREEN_WIDTH*0.5, self.SCREEN_HEIGHT*0.95, arcade.color.WHITE, 28,
+                align="center", anchor_x="center", anchor_y="center"
+                )
 
     def on_draw(self):
         """ Render the screen. """
@@ -186,11 +225,11 @@ class GameManager(arcade.Window):
         arcade.start_render()
 
         # Redirect to main menu
-        # if self.current_state == GameState.MENU:
-        #     self.draw_menu()
+        if self.current_state == GameState.MENU:
+            self.draw_menu()
         
         # Redirect to in game screen
-        if self.current_state == GameState.GAME_RUNNING:
+        elif self.current_state == GameState.GAME_RUNNING:
             self.draw_game()
 
         # Redirect to game over screen
@@ -255,7 +294,7 @@ class GameManager(arcade.Window):
         """ Called whenever a key is pressed. """
 
         # Shoot knife
-        if key == arcade.key.SPACE and self.knife_count > 0:
+        if key == arcade.key.SPACE and self.knife_count > 0 and self.current_state == GameState.GAME_RUNNING:
             self.knife_count -= 1
 
             # Play knife shooting animation
@@ -273,7 +312,13 @@ class GameManager(arcade.Window):
             self.knife_count_display_list[-knife_used].alpha = (0)
 
         # Restart game
-        if key == arcade.key.ENTER and self.current_state == GameState.GAME_OVER:
+        if (
+            key == arcade.key.ENTER and 
+            (
+                self.current_state == GameState.GAME_OVER or 
+                self.current_state == GameState.MENU
+            )
+        ):
             self.setup()
             self.current_state = GameState.GAME_RUNNING
     

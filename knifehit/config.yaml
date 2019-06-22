@@ -3,7 +3,10 @@ assets_path:
     knife_propelled: "assets/sounds/knife_propelled.mp3"
     target_hitted: "assets/sounds/target_destroyed.mp3"
     target_destroyed: "assets/sounds/target_hitted.mp3"
+    boss1_hitted: "assets/sounds/boss1_hitted.mp3"
+    boss2_destroyed: "assets/sounds/boss2_destroyed.mp3"
   images:
+    logo: "assets/images/logo.png"
     background_ingame: "assets/images/background/bg1.png"
     background_gameover: "assets/images/background/bg2.png"
     knife: "assets/images/knife/knife1.png"

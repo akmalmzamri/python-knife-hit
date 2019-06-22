@@ -22,9 +22,12 @@ class Boss(arcade.Sprite):
         self.SPRITE_SCALING = GAME_CONFIG["general_settings"]["sprite_scaling"]
         self.TARGET_POSITION = (self.SCREEN_WIDTH//2, self.SCREEN_HEIGHT*(0.7))
         self.TARGET_ROTATION_SPEED = GAME_CONFIG["target_settings"]["rotation_speed"]
-        self.TARGET_IMAGE = GAME_CONFIG["assets_path"]["images"]["target"]
+        self.TARGET_IMAGE = GAME_CONFIG["assets_path"]["images"]["boss"]["boss1"]
 
         super().__init__(self.TARGET_IMAGE, self.SPRITE_SCALING/scale_ratio)
+
+        self.TARGET_HITTED_SOUND = GAME_CONFIG["assets_path"]["sounds"]["boss1_hitted"]
+        self.TARGET_HITTED_SOUND = arcade.load_sound(self.TARGET_HITTED_SOUND)
         
         self.center_x = self.TARGET_POSITION[0]
         self.center_y = self.TARGET_POSITION[1]

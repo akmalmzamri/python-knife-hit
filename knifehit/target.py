@@ -25,6 +25,9 @@ class Target(arcade.Sprite):
         self.TARGET_IMAGE = GAME_CONFIG["assets_path"]["images"]["target"]
 
         super().__init__(self.TARGET_IMAGE, self.SPRITE_SCALING/scale_ratio)
+
+        self.TARGET_HITTED_SOUND = GAME_CONFIG["assets_path"]["sounds"]["target_hitted"]
+        self.TARGET_HITTED_SOUND = arcade.load_sound(self.TARGET_HITTED_SOUND)
         
         self.center_x = self.TARGET_POSITION[0]
         self.center_y = self.TARGET_POSITION[1]
@@ -44,7 +47,7 @@ class Target(arcade.Sprite):
             self.rotation_mode = rotation_mode
 
         # Override the rotation mode here for testing purposed
-        self.rotation_mode = RotationMode.BACK_AND_FORTH
+        # self.rotation_mode = RotationMode.BACK_AND_FORTH
         
         if self.rotation_mode == RotationMode.NORMAL:
             pass
