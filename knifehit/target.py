@@ -29,17 +29,42 @@ class Target(arcade.Sprite):
         self.center_x = self.TARGET_POSITION[0]
         self.center_y = self.TARGET_POSITION[1]
         # self.angle = random.randrange(360)
-        self.change_angle = self.TARGET_ROTATION_SPEED
+        # self.change_angle = self.TARGET_ROTATION_SPEED
         
         self.hit_impact_animation = False
         self.original_position = self.center_y
-        self.animation_counter = 0
+        
+        self.impact_animation_counter = 0
+        self.rotation_animation_counter = 0
+        self.rotation_state = None
 
-        self.counter = 0
         if rotation_mode is None:
             self.rotation_mode = random.choice(list(RotationMode))
         else:
             self.rotation_mode = rotation_mode
+
+        # Override the rotation mode here for testing purposed
+        self.rotation_mode = RotationMode.BACK_AND_FORTH
+        
+        if self.rotation_mode == RotationMode.NORMAL:
+            pass
+        elif self.rotation_mode == RotationMode.REVERSE:
+            self.TARGET_ROTATION_SPEED = -self.TARGET_ROTATION_SPEED
+        elif self.rotation_mode == RotationMode.FAST_AND_SLOW:
+            self.rotation_state = "Decreasing"
+        elif self.rotation_mode == RotationMode.BACK_AND_FORTH:
+            self.rotation_state = "Back"
+            self.rotation_direction = 1
+        elif self.rotation_mode == "STATIC":
+            self.TARGET_ROTATION_SPEED = 0
+        else:
+            pass
+        
+    def hit_impact(self):
+        """ Initialize the "hit impact" state """
+
+        self.hit_impact_animation = True
+        self.impact_animation_counter = 3
 
     def update(self):
         """ Movement and game logic """
@@ -47,22 +72,38 @@ class Target(arcade.Sprite):
         # Rotate the target.
         # The arcade.Sprite class has an "angle" attribute that controls
         # the sprite rotation. Change this, and the sprite rotates.
-        self.angle += self.change_angle
+
+        if self.rotation_mode == RotationMode.FAST_AND_SLOW:
+            if self.rotation_state is "Decreasing":
+                self.TARGET_ROTATION_SPEED -= 0.005
+            if self.rotation_state is "Decreasing" and self.TARGET_ROTATION_SPEED <= 0:
+                self.rotation_state = "Increasing"
+            if self.rotation_state is "Increasing":
+                self.TARGET_ROTATION_SPEED += 0.01
+            if self.rotation_state is "Increasing" and self.TARGET_ROTATION_SPEED >= 3:
+                self.rotation_state = "Decreasing"
+        
+        if self.rotation_mode == RotationMode.BACK_AND_FORTH:
+            if self.rotation_state is "Back":
+                self.TARGET_ROTATION_SPEED -= 0.01
+            if self.rotation_state is "Back" and self.TARGET_ROTATION_SPEED <= -4:
+                self.rotation_state = "Forth"
+            if self.rotation_state is "Forth":
+                self.TARGET_ROTATION_SPEED += 0.05
+            if self.rotation_state is "Forth" and self.TARGET_ROTATION_SPEED >= 4:
+                self.rotation_state = "Back"
+
+
+        self.angle += self.TARGET_ROTATION_SPEED
 
         # Play the hit impact animation
-        if self.hit_impact_animation and self.animation_counter > 0:
+        if self.hit_impact_animation and self.impact_animation_counter > 0:
             self.center_y += 3
             self.color = (255, 179, 179)
-            self.animation_counter -= 1
+            self.impact_animation_counter -= 1
         else:
             self.color = (255, 255, 255)
             self.hit_impact_animation = False
-            self.animation_counter = 0
+            self.impact_animation_counter = 0
             self.center_y = self.original_position
-    
-    def hit_impact(self):
-        """ Initialize the "hit impact" state """
-
-        self.hit_impact_animation = True
-        self.animation_counter = 3
         

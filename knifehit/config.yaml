@@ -12,8 +12,8 @@ assets_path:
       foreground: "assets/images/knife-count/foreground.png"
       background: "assets/images/knife-count/background.png"
     boss:
-      boss1: ""
-      boss2: ""
+      boss1: "assets/images/boss/apple-pie.png"
+      boss2: "assets/images/boss/moon.png"
 general_settings:
   sprite_scaling: 0.5
   screen_width: 540
