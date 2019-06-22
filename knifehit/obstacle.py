@@ -4,7 +4,7 @@ import math
 class Obstacle(arcade.Sprite):
     """ Obstacle class """
 
-    def __init__(self, GAME_CONFIG, rotation_speed, rotation_radius, rotation_center, initial_rotation_position):
+    def __init__(self, GAME_CONFIG, rotation_speed, rotation_radius, rotation_center, initial_rotation_position, rotation_mode=None):
         """ Initialize obstacle """
 
         self.SPRITE_SCALING = GAME_CONFIG["general_settings"]["sprite_scaling"]
@@ -28,5 +28,3 @@ class Obstacle(arcade.Sprite):
         self.angle = self.rotation+self.initial_rotation_position+90
         self.center_x = (self.rotation_radius * math.cos(math.radians(self.rotation+self.initial_rotation_position))) + self.rotation_center[0]
         self.center_y = (self.rotation_radius * math.sin(math.radians(self.rotation+self.initial_rotation_position))) + self.rotation_center[1]
-
-

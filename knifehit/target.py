@@ -1,11 +1,20 @@
 import arcade
+import random
+from enum import Enum
+
+class RotationMode(Enum):
+    """ Store rotation mode in enum """
+    NORMAL = 1
+    REVERSE = 2
+    BACK_AND_FORTH = 3
+    FAST_AND_SLOW = 4
 
 class Target(arcade.Sprite):
     """ 
     Target class
     """
 
-    def __init__(self, GAME_CONFIG, scale_ratio=1):
+    def __init__(self, GAME_CONFIG, scale_ratio=1, rotation_mode=None):
         """ Initialize target """
 
         self.SCREEN_WIDTH = GAME_CONFIG["general_settings"]["screen_width"]
@@ -25,6 +34,12 @@ class Target(arcade.Sprite):
         self.hit_impact_animation = False
         self.original_position = self.center_y
         self.animation_counter = 0
+
+        self.counter = 0
+        if rotation_mode is None:
+            self.rotation_mode = random.choice(list(RotationMode))
+        else:
+            self.rotation_mode = rotation_mode
 
     def update(self):
         """ Movement and game logic """

@@ -27,6 +27,10 @@ class Knife(arcade.Sprite):
         self.rotation = 0
         self.target_hitted = False
         self.knife_hitted = False
+
+        # Reshape the collision
+        # self._set_collision_radius(self.collision_radius*0)
+        
     
     def shoot_knife(self):
         """ Initialize the "knife shot" state """
@@ -58,7 +62,10 @@ class Knife(arcade.Sprite):
 
     def update(self):
         """ Movement and game logic """
-
+        
+        # Reshape the collision
+        # self.set_points((self.points))
+        
         # Play the knife propelled animation
         if self.knife_hitted:
             self.center_y += -30

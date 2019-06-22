@@ -356,7 +356,6 @@ class GameManager(arcade.Window):
                 self.obstacle = Obstacle(self.GAME_CONFIG, rotation_speed, rotation_radius, rotation_center, initial_rotation_position)
                 self.obstacle_list.append(self.obstacle)
     
-
     def trigger_game_over(self, delay):
         """ Trigger game over after certain delay """
         time.sleep(delay)
