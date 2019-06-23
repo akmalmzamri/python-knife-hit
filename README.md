@@ -9,6 +9,7 @@ Knife Hit is a popular hyper-casual mobile game published by [Ketchapp](http://w
 ## Features  
 * Challenging but fun mechanics
 * Unique boss fights
+* Randomly generated obstacle
 * No Ads or In App Purchase!!
 
 ## Pending Features
