@@ -24,7 +24,11 @@ Knife Hit is a popular hyper-casual mobile game published by [Ketchapp](http://w
 To install the dependencies, navigate to the project directory and execute this command:
 
 ```bash
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+cd knifehit
+python knifehit.py
 ```
 
 ## Screenshot
